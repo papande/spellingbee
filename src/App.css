@@ -20,6 +20,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ... keep your existing heading and button styles below this ... */
 
 /* 3. Force all headings to use the bold, TV-style font */
 h1, h2, h3, h4, h5, h6 {
