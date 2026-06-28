@@ -222,7 +222,7 @@ return (
             
             <button 
               style={{ ...styles.btnUndo, backgroundColor: '#dc3545', padding: '1.5rem', fontSize: '1.2rem', fontWeight: 'bold' }} 
-              onClick={() => window.location.href = '/#/setup'}
+              onClick={() => window.location.href = '#/setup'}
             >
               Start a New Game
             </button>
