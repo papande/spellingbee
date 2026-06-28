@@ -72,24 +72,64 @@ const Scoreboard = () => {
       transform: 'scale(1)'
     };
   };
-
-  // STATIC STYLES
+// STATIC STYLES
   const styles = {
-    wrapper: { backgroundColor: '#0a0a0a', color: '#ffffff', minHeight: '100vh', padding: '2rem', transition: 'background-color 0.5s ease' },
-    header: { textAlign: 'center', borderBottom: '1px solid #222', paddingBottom: '1rem', marginBottom: '3rem' },
+    // 1. WRAPPER: Changed to an exact height, flex column, and hidden overflow
+    wrapper: { 
+      backgroundColor: '#0a0a0a', 
+      color: '#ffffff', 
+      height: '100vh',        // CHANGED: Strict height instead of minHeight
+      padding: '2rem', 
+      transition: 'background-color 0.5s ease',
+      display: 'flex',          // ADDED
+      flexDirection: 'column',  // ADDED
+      overflow: 'hidden',       // ADDED: Absolutely forbids page scrolling
+      boxSizing: 'border-box'   // ADDED: Ensures the 2rem padding doesn't push it past 100vh
+    },
+    header: { textAlign: 'center', borderBottom: '1px solid #222', paddingBottom: '1rem', marginBottom: '2rem' },
     title: { fontSize: '2.5rem', margin: 0, letterSpacing: '4px', textTransform: 'uppercase', color: '#f39c12' },
-    stage: { textAlign: 'center', marginBottom: '4rem' },
+    
+    // 2. STAGE: Protected from shrinking so the active player is always large
+    stage: { 
+      textAlign: 'center', 
+      marginBottom: '2rem', 
+      flexShrink: 0           // ADDED: Prevents the grid below from squishing this area
+    },
     stageLabel: { fontSize: '1.2rem', color: '#666', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '0.5rem' },
     activeName: { fontSize: '6rem', margin: '1rem 0 0 0', lineHeight: 1, fontWeight: 'bold', textShadow: '0 4px 20px rgba(0,0,0,0.5)', transition: 'all 0.3s ease' },
+    
+    // 3. ROSTER GRID: Forced to absorb remaining space but NEVER exceed it
     rosterGrid: { 
       display: 'grid', 
       gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
       gap: '1rem', 
       width: '95%',
-      margin: '0 auto' 
+      margin: '0 auto',
+      flex: 1,              // ADDED: Tells grid to take all remaining vertical space
+      minHeight: 0,         // CRITICAL: Tells Firefox it is allowed to shrink this container
+      overflow: 'hidden'    // CRITICAL: Hides bottom overflow
     },
-    playerName: { fontSize: '2.5rem', margin: '0 0 1.5rem 0', transition: 'color 0.3s ease' },
-    historyContainer: { display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' },
+
+    // 4. PLAYER CARD: I added this. You must wrap each individual player inside the grid with this!
+    playerCard: {           
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0,         // CRITICAL: Tells Firefox the cards can shrink too
+      overflow: 'hidden'
+    },
+
+    playerName: { fontSize: '2.5rem', margin: '0 0 1rem 0', transition: 'color 0.3s ease' },
+    
+    // 5. HISTORY: Also locked down so a long list of words doesn't break the layout
+    historyContainer: { 
+      display: 'flex', 
+      flexDirection: 'column', 
+      gap: '8px', 
+      alignItems: 'center',
+      minHeight: 0,         // ADDED
+      overflow: 'hidden'    // ADDED: Clips off older words if the list gets too long for the TV
+    },
+    
     wordCorrect: { color: '#4caf50', fontSize: '1.5rem', fontWeight: 'bold' },
     wordIncorrect: { color: '#f44336', fontSize: '1.5rem', textDecoration: 'line-through', opacity: 0.8 },
     noPlayers: { fontSize: '1.5rem', color: '#666', fontStyle: 'italic' }
