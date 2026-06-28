@@ -33,11 +33,16 @@ const Scoreboard = () => {
     
     const baseStyle = {
       borderRadius: '12px',
-      padding: `${1.5 * shrinkFactor}rem`, // Less padding
-      minWidth: `${200 * shrinkFactor}px`, // Smaller cards
+      padding: `${1.5 * shrinkFactor}rem`, 
+      minWidth: `${200 * shrinkFactor}px`, 
       textAlign: 'center',
       transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-      border: '2px solid'
+      border: '2px solid',
+      // ADD THESE FOUR LINES:
+      display: 'flex',
+      flexDirection: 'column',
+      minHeight: 0, 
+      overflow: 'hidden'
     };
 
     // 2. The Eliminated Style
@@ -134,6 +139,32 @@ const Scoreboard = () => {
     wordIncorrect: { color: '#f44336', fontSize: '1.5rem', textDecoration: 'line-through', opacity: 0.8 },
     noPlayers: { fontSize: '1.5rem', color: '#666', fontStyle: 'italic' }
   };
+  
+  // DYNAMIC WORD STYLER
+  const getWordStyle = (isCorrect, totalWords) => {
+    // Default sizes for short lists
+    let size = '1.5rem';
+    let space = '8px';
+
+    // As the list grows, shrink the text and margins
+    if (totalWords >= 16) {
+      size = '0.85rem'; space = '1px';
+    } else if (totalWords >= 12) {
+      size = '1rem'; space = '3px';
+    } else if (totalWords >= 8) {
+      size = '1.2rem'; space = '5px';
+    }
+
+    return {
+      color: isCorrect ? '#4caf50' : '#f44336',
+      fontSize: size,
+      fontWeight: isCorrect ? 'bold' : 'normal',
+      textDecoration: isCorrect ? 'none' : 'line-through',
+      opacity: isCorrect ? 1 : 0.8,
+      margin: `0 0 ${space} 0`, // Replaces the gap in the container
+      transition: 'all 0.3s ease'
+    };
+  };
 
   // RENDER UI
   if (gameState.winnerId && players && players[gameState.winnerId] && !gameState.viewFinalBoard) {
@@ -169,17 +200,23 @@ const Scoreboard = () => {
         {playerArray.length > 0 ? (
           playerArray.map((player) => {
             const isActive = player.id === gameState.activePlayerId;
+            const historyLength = player.wordHistory ? player.wordHistory.length : 0; // Get the count!
+
             return (
-              <div key={player.id} style={getCardStyle(player, isActive)}>
+              <div key={player.id} style={getCardStyle(player, isActive, playerArray.length)}>
                 <h2 style={{...styles.playerName, color: isActive ? '#fff' : player.status === 'out' ? '#555' : '#ccc'}}>
                   {player.name}
                 </h2>
                 
-                <div style={styles.historyContainer}>
+                {/* Removed the gap from here, as our new function handles margin! */}
+                <div style={{ ...styles.historyContainer, gap: '0px' }}>
                   {player.wordHistory && player.wordHistory.map((item, index) => (
-                    <div key={index} style={item.correct ? styles.wordCorrect : styles.wordIncorrect}>
+                    
+                    // Apply the dynamic word style here!
+                    <div key={index} style={getWordStyle(item.correct, historyLength)}>
                        {item.word}
                     </div>
+
                   ))}
                 </div>
               </div>
